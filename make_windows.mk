@@ -2,7 +2,7 @@ COMPILER_FLAGS = \
 	-I "C:/local/include/"  \
 	-FC -GL -GS -MP4 -O2 -Oi -W4 -WX -WL -Z7 -Zo -diagnostics:column \
 	-fp:fast -nologo -sdl -guard:cf -permissive- -std:c11 \
-	-wd4996 -wd4189
+	-wd4996 -wd4189 -wd4102
 
 LINKER_FLAGS = \
 	-LIBPATH:"C:/local/lib/" \
