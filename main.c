@@ -1,10 +1,16 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
 #include <libserialport.h>
 
 
+#define SERIAL_LENGTH 9 + 3
+
+
 void print_serial_ports(struct sp_port **port_list) {
-    for (unsigned idx = 0; port_list[idx] != NULL; idx++) {
+    for (int idx = 0; port_list[idx] != NULL; idx++) {
         struct sp_port *port = port_list[idx];
         char *port_name = sp_get_port_name(port);
         char *port_manuf = sp_get_port_usb_manufacturer(port);
@@ -13,7 +19,24 @@ void print_serial_ports(struct sp_port **port_list) {
 }
 
 
+void make_serial(char *buf) {
+    buf[0] = 'S';
+    buf[1] = 'U';
+    buf[2] = 'B';
+    for (int idx = 3; idx < SERIAL_LENGTH; idx++) {
+        buf[idx] = (rand() % 10) + '0';
+    }
+    buf[SERIAL_LENGTH] = '\0';
+}
+
+
 int main() {
+    srand((unsigned)time(NULL));
+
+    char serial[SERIAL_LENGTH + 1];
+    make_serial(serial);
+    printf("%s\n", serial);
+
     printf(
         "#\n"
         "# Submodule GB01 FTDI Fixer\n"
@@ -32,12 +55,12 @@ int main() {
         exit(1);
     }
 
-    unsigned n_ports = 0;
+    int n_ports = 0;
     do {
-        n_ports++;
-        if (post_list[idx] == NULL) {
+        if (port_list[n_ports] == NULL) {
             break;
         }
+        n_ports++;
     } while (true);
 
     print_serial_ports(port_list);
@@ -51,7 +74,7 @@ int main() {
     );
 
     printf("GB01 location > ");
-    unsigned idx_selected_port = 0;
+    int idx_selected_port = 0;
     scanf("%u", &idx_selected_port);
 
     if (idx_selected_port == 0 || idx_selected_port < n_ports) {
@@ -61,7 +84,7 @@ int main() {
 
     char *port_name = sp_get_port_name(port_list[idx_selected_port]);
 
-    // ft232r_prog --manufacturer Submodule --product GB01 --new-serial-number SUB$SERIAL_CODE
+    // ft232r_prog --manufacturer Submodule --product GB01 --new-serial-number serial
     // tools/windows/avrdude/bin/avrdude -q -V -D -C tools/windows/avrdude/etc/avrdude.conf -c arduino -p atmega32 -P port_name -b 115200 -U flash:w:data/gb01-firmware.hex:i
 
 cleanup:
