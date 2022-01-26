@@ -31,6 +31,15 @@ int main() {
         printf("Could not list serial ports! Please contact us at support@submodule.co.\n");
         exit(1);
     }
+
+    unsigned n_ports = 0;
+    do {
+        n_ports++;
+        if (post_list[idx] == NULL) {
+            break;
+        }
+    } while (true);
+
     print_serial_ports(port_list);
 
     printf(
@@ -42,13 +51,18 @@ int main() {
     );
 
     printf("GB01 location > ");
-    unsigned input_idx = 0;
-    scanf("%u", &input_idx);
+    unsigned idx_selected_port = 0;
+    scanf("%u", &idx_selected_port);
 
-    if (input_idx == 0) {
+    if (idx_selected_port == 0 || idx_selected_port < n_ports) {
         printf("\nNo location chosen, exiting.\n");
         exit(1);
     }
+
+    char *port_name = sp_get_port_name(port_list[idx_selected_port]);
+
+    // ft232r_prog --manufacturer Submodule --product GB01 --new-serial-number SUB$SERIAL_CODE
+    // tools/windows/avrdude/bin/avrdude -q -V -D -C tools/windows/avrdude/etc/avrdude.conf -c arduino -p atmega32 -P port_name -b 115200 -U flash:w:data/gb01-firmware.hex:i
 
 cleanup:
     sp_free_port_list(port_list);
