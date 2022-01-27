@@ -1,3 +1,4 @@
+#include <conio.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -120,9 +121,12 @@ void find_gb01_port(char *gb01_port_name) {
         struct sp_port *port = port_list[idx];
         char *port_name = sp_get_port_name(port);
         char *port_manuf = sp_get_port_usb_manufacturer(port);
-        if (strcmp(port_manuf, "Submodule") == 0) {
+        if (port_manuf && strcmp(port_manuf, "Submodule") == 0) {
+            printf("Found %s (manufacturer: %s), using this port\n", port_name, port_manuf);
             strcpy(gb01_port_name, port_name);
             return;
+        } else {
+            printf("Found %s (manufacturer: %s), ignoring\n", port_name, port_manuf);
         }
     }
 
@@ -176,8 +180,8 @@ int main() {
     }
 
     if (command_pipe == NULL || command_status != 0) {
-        printf("There was an issue with searching for devices.\n");
-        printf("Please contact us at support@submodule.co.\n");
+        printf("There was an issue with searching for devices. Please double-check that your GB01 is connected.\n");
+        printf("If you're sure the GB01 is connected, please contact us at support@submodule.co.\n");
         goto cleanup;
     }
 
@@ -226,11 +230,20 @@ int main() {
 
     printf("The FTDI data has successfully been written to your device.\n");
     printf("We will now rewrite the device's firmware to make sure everything works correctly.\n");
+    printf("\n");
 
-    char gb01_port_name[256];
+    char gb01_port_name[256] = {'\0'};
     find_gb01_port(gb01_port_name);
 
+    if (strlen(gb01_port_name) == 0) {
+        printf("There was an issue flashing the firmware, because the GB01's serial port could not be found.\n");
+        printf("This might not be a problem. It might also be solved by installing/uninstalling FTDI drivers.\n");
+        printf("Test your GB01, and if you're still having trouble, contact us at support@submodule.co.\n");
+        goto cleanup;
+    }
+
     make_avrdude_command(command, gb01_port_name);
+    printf("%s\n", command);
     command_status = system(command);
 
     if (command_status != 0) {
@@ -240,7 +253,10 @@ int main() {
 
     printf("All data on your GB01 has been successfully updated!\n");
     printf("Your GB01 should work correctly now. If it doesn't, contact us at support@submodule.co.\n");
+    printf("Please disconnect and reconnect your GB01, and restart the GB01 app.\n");
     printf("Thank you for using the GB01!\n");
+
 cleanup:
-    ;
+    printf("(press any key to exit)\n");
+    _getch();
 }
