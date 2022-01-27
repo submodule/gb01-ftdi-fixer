@@ -108,6 +108,29 @@ void make_avrdude_command(char *command, char *port_name) {
 }
 
 
+void find_gb01_port(char *gb01_port_name) {
+    struct sp_port **port_list;
+    if (sp_list_ports(&port_list) != SP_OK) {
+        printf("sp_list_ports() failed!\n");
+        return;
+    }
+
+    for (int idx = 0; port_list[idx] != NULL; idx++) {
+        struct sp_port *port = port_list[idx];
+        char *port_name = sp_get_port_name(port);
+        char *port_manuf = sp_get_port_usb_manufacturer(port);
+        if (strcmp(port_manuf, "Submodule") == 0) {
+            strcpy(gb01_port_name, port_name);
+            return;
+        }
+    }
+
+    // Just clean up on exit
+    /* sp_free_port_list(port_list); */
+}
+
+
+
 int main() {
     srand((unsigned)time(NULL));
 
@@ -144,8 +167,8 @@ int main() {
 
     printf(
         "\n"
-        "Please type the number in front of your GB01 (0, 1, 2, ...) then press enter.\n"
-        "The GB01 will say \"FT232R\". If there's only one device, it's probably the GB01.\n"
+        "Please type the number in front of your GB01 (0, 1, 2, ...) from the list above then press enter.\n"
+        "The GB01 will say \"FT232R\". If there's only one such device, it's probably the GB01.\n"
         "If you don't see your GB01, make sure it's connected, close this window (or type \"exit\"), and restart the program.\n"
         "If you still can't find it, close this window (or type \"exit\") and contact us at support@submodule.co.\n"
         "\n"
@@ -171,8 +194,23 @@ int main() {
         goto cleanup;
     }
 
-    /* make_avrdude_command(command, port_name); */
-    /* printf("%s\n", command); */
+    printf("The FTDI data has successfully been written to your device.\n");
+    printf("We will now rewrite the device's firmware to make sure everything works correctly.\n");
+
+    char gb01_port_name[256];
+    find_gb01_port(gb01_port_name);
+
+    make_avrdude_command(command, gb01_port_name);
+    command_status = system(command);
+
+    if (command_status != 0) {
+        printf("There was an issue flashing the firmware. This might not be a problem.\n");
+        printf("Test your GB01, and if you're still having trouble, contact us at support@submodule.co.\n");
+    }
+
+    printf("All data on your GB01 has been successfully updated!\n");
+    printf("Your GB01 should work correctly now. If it doesn't, contact us at support@submodule.co.\n");
+    printf("Thank you for using the GB01!\n");
 cleanup:
     ;
 }
