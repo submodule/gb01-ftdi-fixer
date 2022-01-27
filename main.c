@@ -6,6 +6,10 @@
 #include <libserialport.h>
 
 
+#define FT_PATH "tools\\windows\\ft232r_prog\\ft232r_prog.exe"
+#define AVRDUDE_PATH "tools\\windows\\avrdude\\bin\\avrdude"
+#define AVRDUDE_CONF_PATH "tools/windows/avrdude/etc/avrdude.conf"
+#define FIRMWARE_PATH "data/gb01-firmware.hex"
 #define SERIAL_LENGTH 9 + 3
 
 
@@ -27,6 +31,20 @@ void make_serial(char *buf) {
         buf[idx] = (rand() % 10) + '0';
     }
     buf[SERIAL_LENGTH] = '\0';
+}
+
+
+void make_ft_command(char *ft_command, char *serial) {
+    strcpy(ft_command, FT_PATH " --manufacturer Test --product Test --new-serial-number test1234");
+    /* strcpy(ft_command, FT_PATH " --manufacturer Submodule --product GB01 --new-serial-number "); */
+    /* strcat(ft_command, serial); */
+}
+
+
+void make_avrdude_command(char *avrdude_command, char *port_name) {
+    strcpy(avrdude_command, AVRDUDE_PATH " -q -V -D -C " AVRDUDE_CONF_PATH " -c arduino -p atmega32 -P ");
+    strcat(avrdude_command, port_name);
+    strcat(avrdude_command, " -b 115200 -U flash:w:" FIRMWARE_PATH ":i");
 }
 
 
@@ -52,7 +70,7 @@ int main() {
     struct sp_port **port_list;
     if (sp_list_ports(&port_list) != SP_OK) {
         printf("Could not list serial ports! Please contact us at support@submodule.co.\n");
-        exit(1);
+        goto cleanup;
     }
 
     int n_ports = 0;
@@ -74,18 +92,26 @@ int main() {
     );
 
     printf("GB01 location > ");
-    int idx_selected_port = 0;
-    scanf("%u", &idx_selected_port);
+    int selected_port = 0;
+    scanf("%u", &selected_port);
 
-    if (idx_selected_port == 0 || idx_selected_port < n_ports) {
+    if (selected_port == 0 || selected_port > n_ports) {
         printf("\nNo location chosen, exiting.\n");
-        exit(1);
+        goto cleanup;
     }
 
-    char *port_name = sp_get_port_name(port_list[idx_selected_port]);
+    char *port_name = sp_get_port_name(port_list[selected_port - 1]);
 
-    // ft232r_prog --manufacturer Submodule --product GB01 --new-serial-number serial
-    // tools/windows/avrdude/bin/avrdude -q -V -D -C tools/windows/avrdude/etc/avrdude.conf -c arduino -p atmega32 -P port_name -b 115200 -U flash:w:data/gb01-firmware.hex:i
+    char ft_command[1024];
+    make_ft_command(ft_command, serial);
+
+    char avrdude_command[1024];
+    make_avrdude_command(avrdude_command, port_name);
+
+    printf("%s\n", ft_command);
+    system(ft_command);
+
+    /* printf("%s\n", avrdude_command); */
 
 cleanup:
     sp_free_port_list(port_list);
