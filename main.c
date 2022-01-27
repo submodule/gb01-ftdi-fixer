@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include <libserialport.h>
@@ -156,11 +157,25 @@ int main() {
     );
 
     char command[1024];
-    int command_status;
+    int command_status = -1;
+    FILE *command_pipe;
+    char result_line[1024];
     make_ft_scan_command(command);
-    command_status = system(command);
+    command_pipe = _popen(command, "rt");
 
-    if (command_status != 0) {
+    if (command_pipe != NULL) {
+        while (fgets(result_line, sizeof(result_line), command_pipe) != NULL) {
+            // Only print lines that list devices. Why? ft_prog sometimes prints errors when actually everything works
+            // fine, and only on certain systems. :)
+            if (strncmp(result_line, "Device ", 7) == 0) {
+                printf("%s", result_line);
+            }
+        }
+
+        command_status = _pclose(command_pipe);
+    }
+
+    if (command_pipe == NULL || command_status != 0) {
         printf("There was an issue with searching for devices.\n");
         printf("Please contact us at support@submodule.co.\n");
         goto cleanup;
@@ -186,14 +201,28 @@ int main() {
     }
 
     make_ft_write_command(command, selected_port);
-    command_status = system(command);
+    command_pipe = _popen(command, "rt");
+
+    if (command_pipe != NULL) {
+        while (fgets(result_line, sizeof(result_line), command_pipe) != NULL) {
+            // Only print lines that list devices. Why? ft_prog sometimes prints errors when actually everything works
+            // fine, and only on certain systems. :)
+            if (strncmp(result_line, "Device ", 7) == 0) {
+                printf("%s", result_line);
+            }
+        }
+
+        command_status = _pclose(command_pipe);
+    }
+
     printf("\n");
 
-    if (command_status != 0) {
+    if (command_pipe == NULL || command_status != 0) {
         printf("There was an issue writing the new data to the device.\n");
         printf("Please contact us at support@submodule.co.\n");
         goto cleanup;
     }
+
 
     printf("The FTDI data has successfully been written to your device.\n");
     printf("We will now rewrite the device's firmware to make sure everything works correctly.\n");
