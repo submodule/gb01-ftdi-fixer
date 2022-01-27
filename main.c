@@ -135,7 +135,6 @@ void find_gb01_port(char *gb01_port_name) {
 }
 
 
-
 int main() {
     srand((unsigned)time(NULL));
 
