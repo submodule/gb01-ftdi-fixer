@@ -150,7 +150,8 @@ int main() {
         "#\n"
         "\n"
         "This tool allows you to update your Submodule's GB01's FTDI information (and firmware).\n"
-        "First of all, let's find your GB01.\n"
+        "First of all, let's find your GB01. Make sure it's connected to your computer, but that\n"
+        "no game cartridge is connected to the GB01.\n"
         "\n"
     );
 
