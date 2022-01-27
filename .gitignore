@@ -1,4 +1,5 @@
 bin/*
 !bin/.gitkeep
+dist/
 
 gb01.xml

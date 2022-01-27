@@ -10,7 +10,7 @@ LINKER_FLAGS = \
 	-CGTHREADS:8 -DEBUG:FULL -INCREMENTAL:no -opt:ref \
 	libserialport.lib user32.lib gdi32.lib shell32.lib
 
-.PHONY: main run clean
+.PHONY: main dist run clean
 
 main:
 	@echo "############################################################"
@@ -23,6 +23,12 @@ main:
 		-link $(LINKER_FLAGS) \
 		-out:bin/gb01-ftdi-fixer.exe
 	ctime -end bin/gb01-ftdi-fixer.ctm %LastError%
+
+dist:
+	mkdir -p dist/
+	cp bin/gb01-ftdi-fixer.exe dist/
+	cp -r data dist/data
+	cp -r tools dist/tools
 
 run:
 	@bin/gb01-ftdi-fixer.exe
