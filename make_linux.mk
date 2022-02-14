@@ -10,33 +10,32 @@ LINKER_FLAGS = \
 	-CGTHREADS:8 -DEBUG:FULL -INCREMENTAL:no -opt:ref \
 	user32.lib gdi32.lib shell32.lib
 
+COMPILER_FLAGS = \
+	-D_FORTIFY_SOURCE=2 -ggdb3 -Og -Wall -Werror -Wextra -pedantic \
+	-std=gnu11 \
+	-Wno-unused-result
+
+LINKER_FLAGS = \
+	-lserialport
+
 .PHONY: main dist run clean
 
 main:
 	@echo "############################################################"
 	@echo "### Building"
 	@echo "############################################################"
-	ctime -begin bin/gb01-ftdi-fixer.ctm
-	cl $(COMPILER_FLAGS) \
-		main.c \
-		libserialport.lib \
-		-Fo"bin/" \
-		-link $(LINKER_FLAGS) \
-		-out:bin/gb01-ftdi-fixer.exe
-	cp dlls/* bin/
-	ctime -end bin/gb01-ftdi-fixer.ctm %LastError%
+	time gcc $(COMPILER_FLAGS) main.c -o bin/gb01-ftdi-fixer $(LINKER_FLAGS)
 
 dist:
 	rm -rf dist/
 	mkdir -p dist/
-	cp bin/gb01-ftdi-fixer.exe dist/
-	cp dlls/* dist/
+	cp bin/gb01-ftdi-fixer dist/
 	cp -r data dist/data
 	mkdir -p dist/tools
-	cp -r tools/windows dist/tools/windows
+	cp -r tools/linux dist/tools/linux
 
 run:
-	@bin/gb01-ftdi-fixer.exe
+	@bin/gb01-ftdi-fixer
 
 clean:
 	rm bin/*

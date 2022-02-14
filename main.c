@@ -1,4 +1,23 @@
-#include <conio.h>
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || \
+    defined(__NT__) || defined(__CYGWIN__) || defined(__MINGW32__)
+  #define PLATFORM_WINDOWS
+#elif defined(__APPLE__)
+  #define PLATFORM_MACOS
+  #define PLATFORM_POSIX
+#elif defined(__linux__) || defined(__unix__)
+  #define PLATFORM_UNIX
+  #define PLATFORM_POSIX
+#elif defined(__FreeBSD)
+  #define PLATFORM_FREEBSD
+  #define PLATFORM_POSIX
+#else
+  #error "Unknown platform"
+#endif
+
+
+#ifdef PLATFORM_WINDOWS
+    #include <conio.h>
+#endif
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -150,6 +169,13 @@ find_gb01_port(char *gb01_port_name)
 int
 main()
 {
+    char command[1024];
+    int command_status = -1;
+    FILE *command_pipe;
+    char result_line[1024];
+    int selected_port = -1;
+    char gb01_port_name[256] = {'\0'};
+
     srand((unsigned)time(NULL));
 
     char xml[4096];
@@ -173,12 +199,12 @@ main()
         "\n"
     );
 
-    char command[1024];
-    int command_status = -1;
-    FILE *command_pipe;
-    char result_line[1024];
     make_ft_scan_command(command);
-    command_pipe = _popen(command, "rt");
+    #ifdef PLATFORM_WINDOWS
+        command_pipe = _popen(command, "rt");
+    #else
+        command_pipe = popen(command, "rt");
+    #endif
 
     if (command_pipe != NULL) {
         while (fgets(result_line, sizeof(result_line), command_pipe) != NULL) {
@@ -189,11 +215,15 @@ main()
             }
         }
 
-        command_status = _pclose(command_pipe);
+        #ifdef PLATFORM_WINDOWS
+            command_status = _pclose(command_pipe);
+        #else
+            command_status = pclose(command_pipe);
+        #endif
     }
 
     if (command_pipe == NULL || command_status != 0) {
-        printf("There was an issue with searching for devices. Please double-check that your GB01 is connected.\n");
+        printf("There was an issue searching for devices. Please double-check that your GB01 is connected.\n");
         printf("If you're sure the GB01 is connected, please contact us at support@submodule.co.\n");
         goto cleanup;
     }
@@ -208,7 +238,6 @@ main()
     );
 
     printf("GB01 device > ");
-    int selected_port = -1;
     scanf("%d", &selected_port);
     printf("\n");
 
@@ -218,7 +247,11 @@ main()
     }
 
     make_ft_write_command(command, selected_port);
-    command_pipe = _popen(command, "rt");
+    #ifdef PLATFORM_WINDOWS
+        command_pipe = _popen(command, "rt");
+    #else
+        command_pipe = popen(command, "rt");
+    #endif
 
     if (command_pipe != NULL) {
         while (fgets(result_line, sizeof(result_line), command_pipe) != NULL) {
@@ -229,7 +262,11 @@ main()
             }
         }
 
-        command_status = _pclose(command_pipe);
+        #ifdef PLATFORM_WINDOWS
+            command_status = _pclose(command_pipe);
+        #else
+            command_status = pclose(command_pipe);
+        #endif
     }
 
     printf("\n");
@@ -245,7 +282,6 @@ main()
     printf("We will now rewrite the device's firmware to make sure everything works correctly.\n");
     printf("\n");
 
-    char gb01_port_name[256] = {'\0'};
     find_gb01_port(gb01_port_name);
 
     if (strlen(gb01_port_name) == 0) {
@@ -271,5 +307,9 @@ main()
 
 cleanup:
     printf("(press any key to exit)\n");
-    _getch();
+    #ifdef PLATFORM_WINDOWS
+        _getch();
+    #else
+        getchar();
+    #endif
 }

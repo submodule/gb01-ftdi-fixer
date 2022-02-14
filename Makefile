@@ -3,8 +3,8 @@ ifeq ($(OS),Windows_NT)
 else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Darwin)
-		$(error macOS not supported yet.)
+		include make_macos.mk
 	else
-		$(error Linux not supported yet.)
+		include make_linux.mk
 	endif
 endif
