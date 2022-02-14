@@ -70,7 +70,9 @@
     "</FT_EEPROM>\n"
 
 
-void make_serial(char *buf) {
+void
+make_serial(char *buf)
+{
     for (int idx = 0; idx < SERIAL_LENGTH; idx++) {
         buf[idx] = (rand() % 10) + '0';
     }
@@ -78,7 +80,9 @@ void make_serial(char *buf) {
 }
 
 
-void make_xml(char *buf) {
+void
+make_xml(char *buf)
+{
     char serial[SERIAL_LENGTH + 1];
     make_serial(serial);
 
@@ -88,12 +92,16 @@ void make_xml(char *buf) {
 }
 
 
-void make_ft_scan_command(char *command) {
+void
+make_ft_scan_command(char *command)
+{
     strcpy(command, FT_PATH " scan");
 }
 
 
-void make_ft_write_command(char *command, int idx) {
+void
+make_ft_write_command(char *command, int idx)
+{
     char idx_as_str[32];
     sprintf(idx_as_str, "%d", idx);
 
@@ -103,14 +111,18 @@ void make_ft_write_command(char *command, int idx) {
 }
 
 
-void make_avrdude_command(char *command, char *port_name) {
+void
+make_avrdude_command(char *command, char *port_name)
+{
     strcpy(command, AVRDUDE_PATH " -q -V -D -C " AVRDUDE_CONF_PATH " -c arduino -p atmega32 -P ");
     strcat(command, port_name);
     strcat(command, " -b 115200 -U flash:w:" FIRMWARE_PATH ":i");
 }
 
 
-void find_gb01_port(char *gb01_port_name) {
+void
+find_gb01_port(char *gb01_port_name)
+{
     struct sp_port **port_list;
     if (sp_list_ports(&port_list) != SP_OK) {
         printf("sp_list_ports() failed!\n");
@@ -135,7 +147,9 @@ void find_gb01_port(char *gb01_port_name) {
 }
 
 
-int main() {
+int
+main()
+{
     srand((unsigned)time(NULL));
 
     char xml[4096];
