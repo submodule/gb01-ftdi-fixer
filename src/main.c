@@ -87,10 +87,7 @@ find_gb01_port(char *gb01_port_name)
 
 #if defined(PLATFORM_WINDOWS)
     #include "windows.c"
-#endif
-
-
-#ifndef PLATFORM_WINDOWS
+#else
     #include "posix.c"
 #endif
 
