@@ -1,2 +1,2 @@
-#define AVRDUDE_PATH "tools/linux/avrdude/bin/avrdude"
-#define AVRDUDE_CONF_PATH "tools/linux/avrdude/etc/avrdude.conf"
+#define AVRDUDE_PATH "tools/linux64/avrdude/bin/avrdude"
+#define AVRDUDE_CONF_PATH "tools/linux64/avrdude/etc/avrdude.conf"

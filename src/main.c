@@ -141,6 +141,10 @@ main()
     if (command_status != 0) {
         printf("There was an issue flashing the firmware. This might not be a problem.\n");
         printf("Test your GB01, and if you're still having trouble, contact us at support@submodule.co.\n");
+        #if defined(PLATFORM_UNIX)
+            printf("Please note that this program currently only supports the amd64 architecture.\n");
+            printf("If you need support for a different architecture, let us know.\n");
+        #endif
     }
 
     printf("All data on your GB01 has been successfully updated!\n");
