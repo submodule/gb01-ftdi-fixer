@@ -24,7 +24,7 @@ main:
 	@echo "############################################################"
 	@echo "### Building"
 	@echo "############################################################"
-	time gcc $(COMPILER_FLAGS) main.c -o bin/gb01-ftdi-fixer $(LINKER_FLAGS)
+	time gcc $(COMPILER_FLAGS) src/main.c -o bin/gb01-ftdi-fixer $(LINKER_FLAGS)
 
 dist:
 	rm -rf dist/

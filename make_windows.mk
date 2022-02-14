@@ -18,7 +18,7 @@ main:
 	@echo "############################################################"
 	ctime -begin bin/gb01-ftdi-fixer.ctm
 	cl $(COMPILER_FLAGS) \
-		main.c \
+		src/main.c \
 		libserialport.lib \
 		-Fo"bin/" \
 		-link $(LINKER_FLAGS) \
