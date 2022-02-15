@@ -174,7 +174,7 @@ main()
     printf("Please disconnect and reconnect your GB01, and restart the GB01 app.\n");
     printf("Thank you for using the GB01!\n");
 
-    printf("(press <Enter> to exit)\n");
+    printf("Press <Enter> to exit.\n");
     #if defined(PLATFORM_WINDOWS)
         _getch();
     #else

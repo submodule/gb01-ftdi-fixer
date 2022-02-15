@@ -82,12 +82,13 @@ select_and_program_device_windows()
         "\n"
     );
 
-    int selected_port = -1;
     printf("GB01 device > ");
-    scanf("%d", &selected_port);
+    char line[1024];
+    fgets(line, 1024, stdin);
+    int selected_port = atoi(line);
     printf("\n");
 
-    if (selected_port == -1) {
+    if ((selected_port == 0 && line[0] != '0') || selected_port < 0 || selected_port >= n_ports) {
         printf("No location chosen, exiting.\n");
         exit(1);
     }

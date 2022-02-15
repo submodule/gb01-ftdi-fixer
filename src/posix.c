@@ -1,11 +1,13 @@
 void
-make_prog_command(char *command)
+make_prog_command(char *command, char *old_serial)
 {
     char serial[SERIAL_LENGTH + 1];
     make_serial(serial);
 
     strcpy(command, PROG_PATH " --manufacturer Submodule --product GB01 --new-serial-number SUB");
     strcat(command, serial);
+    strcat(command, " --old-serial-number ");
+    strcat(command, old_serial);
 }
 
 
@@ -55,13 +57,13 @@ select_and_program_device_posix(struct sp_port **port_list)
     int selected_port = atoi(line);
     printf("\n");
 
-    if (selected_port == -1 || selected_port < 0 || selected_port >= n_ports) {
-        printf("Invalid location chosen, exiting.\n");
+    if ((selected_port == 0 && line[0] != '0') || selected_port < 0 || selected_port >= n_ports) {
+        printf("No location chosen, exiting.\n");
         exit(1);
     }
 
     char command[1024];
-    make_prog_command(command);
+    make_prog_command(command, sp_get_port_usb_serial(port_list[selected_port]));
     printf("%s\n", command);
     int command_status = system(command);
     printf("\n");
@@ -78,6 +80,5 @@ select_and_program_device_posix(struct sp_port **port_list)
     printf("We will now rewrite the device's firmware to make sure everything works correctly.\n");
     printf("\n");
     printf("Before we can do this, please disconnect and reconnect your GB01, then press <Enter>.\n");
-
     fgets(line, 1024, stdin);
 }
