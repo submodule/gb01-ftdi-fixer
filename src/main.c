@@ -134,12 +134,6 @@ main()
         "\n"
     );
 
-    #if defined(PLATFORM_UNIX)
-        printf("IMPORTANT NOTE: You will most likely need to run this program with sudo, so that it has the necessary\n");
-        printf("permissions to access serial ports.\n");
-        printf("\n");
-    #endif
-
     #if defined(PLATFORM_WINDOWS)
         make_ft_xml();
         select_and_program_device_windows();

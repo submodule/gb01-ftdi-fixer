@@ -1,16 +1,4 @@
 COMPILER_FLAGS = \
-	-I "C:/local/include/"  \
-	-MT -FC -GL -GS -MP4 -O2 -Oi -W4 -WX -WL -Z7 -Zo -diagnostics:column \
-	-fp:fast -nologo -sdl -guard:cf -permissive- -std:c11 \
-	-wd4996 -wd4189 -wd4102 -wd4100
-
-LINKER_FLAGS = \
-	-LIBPATH:"C:/local/lib/libserialport-release" \
-	/SUBSYSTEM:console \
-	-CGTHREADS:8 -DEBUG:FULL -INCREMENTAL:no -opt:ref \
-	user32.lib gdi32.lib shell32.lib
-
-COMPILER_FLAGS = \
 	-D_FORTIFY_SOURCE=2 -ggdb3 -Og -Wall -Werror -Wextra -pedantic \
 	-std=gnu11 \
 	-Wno-unused-result
@@ -26,13 +14,17 @@ main:
 	@echo "############################################################"
 	time gcc $(COMPILER_FLAGS) src/main.c -o bin/gb01-ftdi-fixer $(LINKER_FLAGS)
 
-dist:
+dist: main
 	rm -rf dist/
-	mkdir -p dist/
+	cp -r dist-template/linux dist/
 	cp bin/gb01-ftdi-fixer dist/
+	cp $$(find /lib /usr/lib -name 'libftdi.so.1') dist/
+	cp $$(find /lib /usr/lib -name 'libserialport.so.0') dist/
+	cp $$(find /lib /usr/lib -name 'libusb-0.1.so.4') dist/
 	cp -r data dist/data
 	mkdir -p dist/tools
-	cp -r tools/linux dist/tools/linux
+	cp -r tools/linux64 dist/tools/linux64
+	cd dist && zip -r gb01-ftdi-fixer-linux64.zip *
 
 run:
 	@bin/gb01-ftdi-fixer

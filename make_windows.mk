@@ -26,7 +26,7 @@ main:
 	cp dlls/* bin/
 	ctime -end bin/gb01-ftdi-fixer.ctm %LastError%
 
-dist:
+dist: main
 	rm -rf dist/
 	mkdir -p dist/
 	cp bin/gb01-ftdi-fixer.exe dist/
@@ -34,6 +34,7 @@ dist:
 	cp -r data dist/data
 	mkdir -p dist/tools
 	cp -r tools/windows dist/tools/windows
+	cd dist && zip -r gb01-ftdi-fixer-windows.zip *
 
 run:
 	@bin/gb01-ftdi-fixer.exe
