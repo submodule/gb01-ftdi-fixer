@@ -18,7 +18,7 @@ make_ft_xml()
     FILE *f = fopen(FT_XML_PATH, "w");
     if (f == NULL) {
         printf("Could not open " FT_XML_PATH ", make sure you have sufficient permissions.");
-        goto cleanup;
+        exit(1);
     }
     fputs(xml, f);
     fclose(f);
@@ -44,13 +44,13 @@ make_ft_write_command(char *command, int idx)
 }
 
 
-void select_and_program_device_windows()
+void
+select_and_program_device_windows()
 {
     char command[1024];
     int command_status = -1;
     FILE *command_pipe;
     char result_line[1024];
-    int selected_port = -1;
 
     make_ft_scan_command(command);
     command_pipe = _popen(command, "rt");
@@ -70,7 +70,7 @@ void select_and_program_device_windows()
     if (command_pipe == NULL || command_status != 0) {
         printf("There was an issue searching for devices. Please double-check that your GB01 is connected.\n");
         printf("If you're sure the GB01 is connected, please contact us at support@submodule.co.\n");
-        goto cleanup;
+        exit(1):
     }
 
     printf(
@@ -82,13 +82,14 @@ void select_and_program_device_windows()
         "\n"
     );
 
+    int selected_port = -1;
     printf("GB01 device > ");
     scanf("%d", &selected_port);
     printf("\n");
 
     if (selected_port == -1) {
         printf("No location chosen, exiting.\n");
-        goto cleanup;
+        exit(1);
     }
 
     make_ft_write_command(command, selected_port);
@@ -111,7 +112,7 @@ void select_and_program_device_windows()
     if (command_pipe == NULL || command_status != 0) {
         printf("There was an issue writing the new data to the device.\n");
         printf("Please contact us at support@submodule.co.\n");
-        goto cleanup;
+        exit(1);
     }
 
     printf("The FTDI data has successfully been written to your device.\n");

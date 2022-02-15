@@ -58,6 +58,22 @@ make_avrdude_command(char *command, char *port_name)
 }
 
 
+struct sp_port**
+find_all_ports()
+{
+    struct sp_port **port_list;
+    if (sp_list_ports(&port_list) != SP_OK) {
+        printf("sp_list_ports() failed!\n");
+        return NULL;
+    }
+
+    // Just clean up on exit
+    /* sp_free_port_list(port_list); */
+
+    return port_list;
+}
+
+
 void
 find_gb01_port(char *gb01_port_name)
 {
@@ -118,11 +134,17 @@ main()
         "\n"
     );
 
+    #if defined(PLATFORM_UNIX)
+        printf("IMPORTANT NOTE: You will most likely need to run this program with sudo, so that it has the necessary\n");
+        printf("permissions to access serial ports.\n");
+        printf("\n");
+    #endif
+
     #if defined(PLATFORM_WINDOWS)
         make_ft_xml();
         select_and_program_device_windows();
     #else
-        select_and_program_device_posix();
+        select_and_program_device_posix(find_all_ports());
     #endif
 
     find_gb01_port(gb01_port_name);
@@ -131,7 +153,7 @@ main()
         printf("There was an issue flashing the firmware, because the GB01's serial port could not be found.\n");
         printf("This might not be a problem. It might also be solved by installing/uninstalling FTDI drivers.\n");
         printf("Test your GB01, and if you're still having trouble, contact us at support@submodule.co.\n");
-        goto cleanup;
+        exit(1);
     }
 
     make_avrdude_command(command, gb01_port_name);
@@ -152,11 +174,11 @@ main()
     printf("Please disconnect and reconnect your GB01, and restart the GB01 app.\n");
     printf("Thank you for using the GB01!\n");
 
-cleanup:
-    printf("(press any key to exit)\n");
+    printf("(press <Enter> to exit)\n");
     #if defined(PLATFORM_WINDOWS)
         _getch();
     #else
-        getchar();
+        char line[1024];
+        fgets(line, 1024, stdin);
     #endif
 }
