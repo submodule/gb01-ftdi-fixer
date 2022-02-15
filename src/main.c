@@ -117,6 +117,7 @@ main()
         exit(1);
     #endif
 
+    char line[1024];
     char command[1024];
     int command_status = -1;
     char gb01_port_name[256] = {'\0'};
@@ -144,9 +145,16 @@ main()
     find_gb01_port(gb01_port_name);
 
     if (strlen(gb01_port_name) == 0) {
+        printf("\n");
         printf("There was an issue flashing the firmware, because the GB01's serial port could not be found.\n");
         printf("This might not be a problem. It might also be solved by installing/uninstalling FTDI drivers.\n");
         printf("Test your GB01, and if you're still having trouble, contact us at support@submodule.co.\n");
+        printf("Press <Enter> to exit.\n");
+        #if defined(PLATFORM_WINDOWS)
+            _getch();
+        #else
+            fgets(line, 1024, stdin);
+        #endif
         exit(1);
     }
 
@@ -172,7 +180,6 @@ main()
     #if defined(PLATFORM_WINDOWS)
         _getch();
     #else
-        char line[1024];
         fgets(line, 1024, stdin);
     #endif
 }
