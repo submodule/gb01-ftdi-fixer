@@ -30,6 +30,8 @@ dist: main
 	install_name_tool -change $$(find -L /usr/local/opt -name 'libserialport.0.dylib' 2>&-) @loader_path/libserialport.0.dylib dist/gb01-ftdi-fixer
 	cp $$(find -L /usr/local/opt/gcc -name 'libgcc_s.1.dylib' 2>&-) dist/
 	install_name_tool -change $$(find -L /usr/local/opt/gcc -name 'libgcc_s.1.dylib' 2>&-) @loader_path/libgcc_s.1.dylib dist/gb01-ftdi-fixer
+	cp $$(find -L /usr/local/opt -name 'libusb-1.0.0.dylib' 2>&-) dist/
+	install_name_tool -change $$(find -L /usr/local/opt -name 'libusb-1.0.0.dylib' 2>&-) @loader_path/libusb-1.0.0.dylib dist/libusb-0.1.4.dylib
 	cp -r data dist/data
 	cd dist && zip -r gb01-ftdi-fixer-macos-intel.zip *
 

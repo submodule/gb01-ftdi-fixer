@@ -87,7 +87,12 @@ find_gb01_port(char *gb01_port_name)
         struct sp_port *port = port_list[idx];
         char *port_name = sp_get_port_name(port);
         char *port_manuf = sp_get_port_usb_manufacturer(port);
-        if (port_manuf && strcmp(port_manuf, "Submodule") == 0) {
+        char *macprefix = "/dev/cu.usbserial-SUB";
+        bool is_gb01_port = (
+            (port_manuf && strcmp(port_manuf, "Submodule") == 0) ||
+            (port_name && strncmp(port_name, macprefix, strlen(macprefix)) == 0)
+        );
+        if (is_gb01_port) {
             printf("Found %s (manufacturer: %s), using this port\n", port_name, port_manuf);
             strcpy(gb01_port_name, port_name);
             return;
