@@ -20,9 +20,17 @@ dist: main
 	rm -rf dist/
 	cp -r dist-template/macos dist/
 	cp bin/gb01-ftdi-fixer dist/
-	cp -r data dist/data
 	mkdir -p dist/tools
 	cp -r tools/macos-intel dist/tools/macos-intel
+	cp $$(find -L /usr/local/opt -name 'libftdi.1.dylib' 2>&-) dist/
+	install_name_tool -change $$(find -L /usr/local/opt -name 'libftdi.1.dylib' 2>&-) @loader_path/../../libftdi.1.dylib dist/tools/macos-intel/ft232r_prog
+	cp $$(find -L /usr/local/opt -name 'libusb-0.1.4.dylib' 2>&-) dist/
+	install_name_tool -change $$(find -L /usr/local/opt -name 'libusb-0.1.4.dylib' 2>&-) @loader_path/../../libusb-0.1.4.dylib dist/tools/macos-intel/ft232r_prog
+	cp $$(find -L /usr/local/opt -name 'libserialport.0.dylib' 2>&-) dist/
+	install_name_tool -change $$(find -L /usr/local/opt -name 'libserialport.0.dylib' 2>&-) @loader_path/libserialport.0.dylib dist/gb01-ftdi-fixer
+	cp $$(find -L /usr/local/opt/gcc -name 'libgcc_s.1.dylib' 2>&-) dist/
+	install_name_tool -change $$(find -L /usr/local/opt/gcc -name 'libgcc_s.1.dylib' 2>&-) @loader_path/libgcc_s.1.dylib dist/gb01-ftdi-fixer
+	cp -r data dist/data
 	cd dist && zip -r gb01-ftdi-fixer-macos-intel.zip *
 
 run:

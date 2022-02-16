@@ -29,11 +29,11 @@ main:
 dist: main
 	rm -rf dist/
 	mkdir -p dist/
+	mkdir -p dist/tools
+	cp -r tools/windows dist/tools/windows
 	cp bin/gb01-ftdi-fixer.exe dist/
 	cp dlls/* dist/
 	cp -r data dist/data
-	mkdir -p dist/tools
-	cp -r tools/windows dist/tools/windows
 	cd dist && zip -r gb01-ftdi-fixer-windows.zip *
 
 run:

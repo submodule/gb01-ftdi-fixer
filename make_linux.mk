@@ -18,12 +18,12 @@ dist: main
 	rm -rf dist/
 	cp -r dist-template/linux dist/
 	cp bin/gb01-ftdi-fixer dist/
+	mkdir -p dist/tools
+	cp -r tools/linux64 dist/tools/linux64
 	cp $$(find /lib /usr/lib -name 'libftdi.so.1') dist/
 	cp $$(find /lib /usr/lib -name 'libserialport.so.0') dist/
 	cp $$(find /lib /usr/lib -name 'libusb-0.1.so.4') dist/
 	cp -r data dist/data
-	mkdir -p dist/tools
-	cp -r tools/linux64 dist/tools/linux64
 	cd dist && zip -r gb01-ftdi-fixer-linux64.zip *
 
 run:
